@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-02-03T19:54:46-08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">https://k0dk0de.github.io</title><subtitle>Security, Privacy, Tech,... with a focus on scientists</subtitle><entry><title type="html">Github: Keeping accounts separate &amp;amp; API introduction</title><link href="http://localhost:4000/2020/02/03/Github-Commits-API.html" rel="alternate" type="text/html" title="Github: Keeping accounts separate &amp; API introduction" /><published>2020-02-03T00:00:00-08:00</published><updated>2020-02-03T00:00:00-08:00</updated><id>http://localhost:4000/2020/02/03/Github-Commits-API</id><content type="html" xml:base="http://localhost:4000/2020/02/03/Github-Commits-API.html">&lt;p&gt;Have you ever wondered on how to use github with two user accounts? Do you want to get a short introduction to githubs API and how to find information faster and directly? Then this brief tutorial is for you.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;github-commits-from-two-independent-accounts&quot;&gt;Github commits from two independent accounts&lt;/h1&gt;
+
+&lt;p&gt;I’m hosting this website currently on github and as you might have noticed, I’m not disclosing my name but try to stay private. Furthermore I have a github account that hosts code in my real name. How do I feed both github accouts from one computer? Here’s a brief tutorial on how to do command line commits for two accounts without cross contamination.&lt;/p&gt;
+
+&lt;h2 id=&quot;rsa-key-pair-setup&quot;&gt;RSA key pair setup&lt;/h2&gt;
+
+&lt;p&gt;You can follow the &lt;a href=&quot;https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent&quot; target=&quot;_blank&quot;&gt;github tutorial&lt;/a&gt; for this.&lt;/p&gt;
+
+&lt;p&gt;You will need to create a key for each user, so this process needs to be done twice.&lt;/p&gt;
+
+&lt;p&gt;From the terminal, create a new key pair&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that you don’t need to actually use your real e-mail address! For example, for this website I’m using github’s own no-reply e-mail address for the rsa key.&lt;/p&gt;
+
+&lt;p&gt;Follow the on screen commands. Usually these keys are saved in &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.ssh&lt;/code&gt; under a default name. Since you need two users, choose a key file name that is not the default name, but something that you can identify easily. Check out the new files. For each setup name you will have gotton something like (these are the default file names):&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;id_rsa
+id_rsa.pub
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;*.pub&lt;/code&gt; file is your public key. The other file that has no extension is your private key. &lt;strong&gt;Do not&lt;/strong&gt; upload your private key to a website or anywhere else!&lt;/p&gt;
+
+&lt;p&gt;You can work with a passphrase if you like, up to you if it’s necessary or not. This will depend on your target profile: where do you store these keys? Analyze, then decide.&lt;/p&gt;
+
+&lt;h2 id=&quot;add-your-public-key-to-github&quot;&gt;Add your public key to github&lt;/h2&gt;
+
+&lt;p&gt;Log into your github account. Click on your icon on the top right of the screen, then go to settings. Select &lt;code class=&quot;highlighter-rouge&quot;&gt;SSH and GPG keys&lt;/code&gt;. Then add &lt;code class=&quot;highlighter-rouge&quot;&gt;New SSH key&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Give your key a title, something that is readable and makes you remember later where the key belongs. In the &lt;code class=&quot;highlighter-rouge&quot;&gt;Key&lt;/code&gt; field copy the public key. Then hit add.&lt;/p&gt;
+
+&lt;p&gt;You will need to add the respective key that you want to use to each of your github profiles. So far so good.&lt;/p&gt;
+
+&lt;h2 id=&quot;set-up-profiles-in-ssh&quot;&gt;Set up profiles in &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.ssh&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Let us assume you have two github accounts an account named &lt;code class=&quot;highlighter-rouge&quot;&gt;user1&lt;/code&gt; (which is your default account) and an account named &lt;code class=&quot;highlighter-rouge&quot;&gt;user2&lt;/code&gt;. You also have the following keys just created:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;id_rsa_user1
+id_rsa_user1.pub
+id_rsa_user2
+id_rsa_user2.pub
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Furthermore you have added the &lt;code class=&quot;highlighter-rouge&quot;&gt;id_rsa_user1.pub&lt;/code&gt; file as an SSH key to your github profile for user 1, and the same for user 2.&lt;/p&gt;
+
+&lt;p&gt;Assuming your keys are in the default &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.ssh/&lt;/code&gt; folder: go into that folder and create a new text file named &lt;code class=&quot;highlighter-rouge&quot;&gt;config&lt;/code&gt;. Copy the following text into your file and adjust to your needs:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# key configuration for user1 - the default user
+Host github.com
+  HostName github.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa_user1
+
+# key configuration for user2
+Host user2.github.com
+  HostName github.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa_user2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note the big and important difference is the Host. This will become important next when you check your github repository out.&lt;/p&gt;
+
+&lt;h2 id=&quot;git-clone-for-a-given-user&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;git clone&lt;/code&gt; for a given user&lt;/h2&gt;
+
+&lt;p&gt;If you want to checkout your test repository (named testrepo) from your default (user1) github account, you can run the following command now in the terminal:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone git@github.com:user1/testrepo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;Note:&lt;/em&gt; You will be using the &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh&lt;/code&gt; style cloning and not the https style! In this case, you will automatically check out as user 1 and this repo will be configured under your default user (user1). That’s what you wanted.&lt;/p&gt;
+
+&lt;p&gt;You have a repository called &lt;code class=&quot;highlighter-rouge&quot;&gt;privacynerd&lt;/code&gt; saved in your user2 account and want to work on this one. To clone this repo as user2 you would now run the command:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone git@user2.github.com:user2/privacynerd
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;Note:&lt;/em&gt; The difference is alone in the hostname! make sure you use the same hostname here as you configured in the &lt;code class=&quot;highlighter-rouge&quot;&gt;config&lt;/code&gt; file above!&lt;/p&gt;
+
+&lt;p&gt;You can now edit and commit from both repositories as user1 and user2. The right ssh keys are selected automatically. &lt;strong&gt;But be aware of the user setup!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;user-setup&quot;&gt;User setup&lt;/h2&gt;
+
+&lt;p&gt;This is a common pitfall. You need to know what the global user settings are! The first time you used git, a global user setting file was created, this one contains your name and your e-mail address (or whatever you told it to contain). If you only have one file, then all your commits are going to happen from this name and address (even though with the right keys). To check your settings you can run:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git config --global user.name
+git config --global user.email
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can also see these global variables by looking at the file, which is usually at &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.gitconfig&lt;/code&gt;. This file will contain something like:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[user]
+    name = username
+    email = username@domain.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Here is your global file. Feel free to edit this to none / none and you’ll be set for anonymity. What though if you’d like to have two different user setups? Here again is why it’s nice to have a default account and a separate account.&lt;/p&gt;
+
+&lt;p&gt;In every project folder, e.g., the one you just checked out named &lt;code class=&quot;highlighter-rouge&quot;&gt;privacynerd&lt;/code&gt;, here is a folder named &lt;code class=&quot;highlighter-rouge&quot;&gt;.git&lt;/code&gt;. Inside this folder is a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;config&lt;/code&gt;. Open this file in a text editor. This file contains the local settings. Usually, it will not contain a &lt;code class=&quot;highlighter-rouge&quot;&gt;[user]&lt;/code&gt; section, since this setting is set globally. However, you can set a local configuration here, this will allow you to commit with a different name and email address than your global settings. For this to work just add an entry at the end of the file that reads as following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[user]
+    name = your_alias
+    email = privacyemail
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you now commit from this specific project folder, than this name and e-mail address will be used and not your global one. &lt;em&gt;Note&lt;/em&gt; that you will be required to set this up for every user. If you make a mistake, there will be a commit in your real name. So it might just be safer to set your real name to an alias too.&lt;/p&gt;
+
+&lt;h1 id=&quot;api-introduction&quot;&gt;API Introduction&lt;/h1&gt;
+
+&lt;p&gt;As most websites these days, github also has an application programming interface: an API. It’s actually really useful to know your way around the API a little bit, because certain information can be grabbed much faster this way. Sure you can grab a lot of the information you can find here also from the website, but sometimes it’s just easier to read a well structured json file, even if you’re human :)&lt;/p&gt;
+
+&lt;p&gt;Let’s use the &lt;a href=&quot;https://github.com/hak5&quot; target=&quot;_blank&quot;&gt;Hak5&lt;/a&gt; site as an example. The reason to do this: I learned about the API some time ago from one of their youtube tutorials.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-user-site&quot;&gt;The user site&lt;/h2&gt;
+
+&lt;p&gt;Wanna check out a user? Simply browse to &lt;a href=&quot;https://api.github.com/users/hak5&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://api.github.com/users/hak5
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can already see the structure, e.g., if you replace &lt;code class=&quot;highlighter-rouge&quot;&gt;hak5&lt;/code&gt; with some other username, you’ll get their API interface site. Fun thing, you can directly see the e-mail address that they have given on their site. This can give you a really fast way to check if an account has a public e-mail address on their github page.&lt;/p&gt;
+
+&lt;h2 id=&quot;apigithubcom-json-entries&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;api.github.com/...&lt;/code&gt; json entries&lt;/h2&gt;
+
+&lt;p&gt;You can also see some json entries that look someting like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://api.github.com/users/hak5/repos
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;These entries are links to other pages on the github API site. Click around and browse.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-repos-site&quot;&gt;The repos site&lt;/h2&gt;
+
+&lt;p&gt;Fine, you can get json tables for stuff that you can also see directly and easily on the user profile page. Cool…&lt;/p&gt;
+
+&lt;p&gt;The repo site is more interesting however. For example, browse to &lt;a href=&quot;https://api.github.com/repos/hak5/bashbunny-payloads&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://api.github.com/repos/hak5/bashbunny-payloads
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This gives you an overview of a given repo, in this case from the &lt;code class=&quot;highlighter-rouge&quot;&gt;hak5&lt;/code&gt; user, the &lt;code class=&quot;highlighter-rouge&quot;&gt;bashbunny-payloads&lt;/code&gt; repository. This is also great but you can also directly browse to &lt;a href=&quot;https://api.github.com/repos/hak5/bashbunny-payloads/commits&quot; target=&quot;_blank&quot;&gt;see the commits&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://api.github.com/repos/hak5/bashbunny-payloads/commits
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At first, this looks fairly boring. However, with a more detailed look you can learn a lot on how a repo is set up.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Every commit gets a different number, go ahead open a commit.&lt;/li&gt;
+  &lt;li&gt;In the commit section you can see the user, i.e., who commited to the repo. This can give you a clue on who it is! This is also the reason for the above described pitfall. If you follow the instructions above and keep your secondary github repository private, you can still screw up your privacy if you don’t change the global username of the commit.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;the-overview---where-to-find-more&quot;&gt;The overview - where to find more&lt;/h2&gt;
+
+&lt;p&gt;If you like to find out more about the API, go to its start site: &lt;a href=&quot;https://api.github.com/&quot; target=&quot;_blank&quot;&gt;https://api.github.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;A decent overview on keys is given here and you can follow other fields, such as followers, etc. through, which I have not gone into detail here.&lt;/p&gt;
+
+&lt;p&gt;You can also go ahead to write your own script to look for data on github using the API, this is kind of what it’s made for. Have a look, play around!&lt;/p&gt;
+
+&lt;p&gt;-k0dk0d&lt;/p&gt;</content><author><name>k0dk0d</name></author><category term="Tutorials" /><category term="Privacy" /><category term="Basics" /><category term="Linux" /><summary type="html">Have you ever wondered on how to use github with two user accounts? Do you want to get a short introduction to githubs API and how to find information faster and directly? Then this brief tutorial is for you.</summary></entry><entry><title type="html">Podcasts - Fun for the ear</title><link href="http://localhost:4000/2020/01/31/Podcasts.html" rel="alternate" type="text/html" title="Podcasts - Fun for the ear" /><published>2020-01-31T00:00:00-08:00</published><updated>2020-01-31T00:00:00-08:00</updated><id>http://localhost:4000/2020/01/31/Podcasts</id><content type="html" xml:base="http://localhost:4000/2020/01/31/Podcasts.html">&lt;p&gt;If you’re commuting a lot, you to work out, or you just are bored at home while cleaning, podcasts are a great way of learning something new, having fun, and occupying yourself. Here, I present my favorite podcasts on technology, security, and privacy. Maybe you are looking for something to listen to as well? There’s hopefully something here for every enthusiast, especially since you’re obviously reading some weird corner of the internet.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;I got into listening to podcasts many years ago when podcasters still had to explain at the beginning of a show what podcasts actually are. By now, I probably listen regularly to around a dozen different shows. Security, privacy, and technology are of course also topics that are represented in my podcast list. So let’s dive right into it - in no specific order:&lt;/p&gt;
+
+&lt;h1 id=&quot;darknet-diaries&quot;&gt;Darknet Diaries&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://darknetdiaries.com/&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-31-Podcasts/darknet_diaries.jpg&quot; alt=&quot;Darknet Diaries&quot; style=&quot;float: right; margin-right: 0px; margin-top: 0px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://darknetdiaries.com/&quot; target=&quot;_blank&quot;&gt;Darknet Diaries&lt;/a&gt; is hosted and produced by Jack Rhysider, a security professional turned podcast host. The show has some episodes that discuss the darkweb, however, is in general more about the hidden side of the world wide web. The stories are all true and meticulously researched. Topics include hacks, social engineering, persistent threats, malware, etc.&lt;/p&gt;
+
+&lt;p&gt;Jack is an amazing storyteller and keeps his audience very well glued to the speaker. His calm manner enhances the wow factor when listening and the geek inside him clearly comes through here and there when he talks about specific attacks and techniques and obviously can’t help himself but to explain in detail on how things were done or what his best guess is. This style gives the podcast a very lively atmosphere and keeps you glued to the speaker.&lt;/p&gt;
+
+&lt;p&gt;It’s also fascinating to note how well Darknet Diaries is produced, especially when you make yourself aware of the fact that Jack did not come up like most podcasters at “This American Life”, but is very much self taught. He actually also blogs about podcasting on &lt;a href=&quot;https://lime.link/blog/&quot; target=&quot;_blank&quot;&gt;Lime.Link&lt;/a&gt; and has a tech blog at &lt;a href=&quot;https://www.tunnelsup.com/&quot; target=&quot;_blank&quot;&gt;TunnelsUp.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Some episodes to start with, although be warned, you might just end up listening to them all and then crave for more:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://darknetdiaries.com/episode/13/&quot; target=&quot;_blank&quot;&gt;Carna Botnet&lt;/a&gt;: A security researcher creates a botnet, takes a census of the internet, and produces some amazing maps of the world. Be close to an internet connection when you listen to this one!&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://darknetdiaries.com/episode/29/&quot; target=&quot;_blank&quot;&gt;Stuxnet&lt;/a&gt;: The story of how the CIA sabotaged the air gaped system that controlled the Iranian uranium enrichment centrifuges.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://darknetdiaries.com/episode/41/&quot; target=&quot;_blank&quot;&gt;Just Visiting&lt;/a&gt;: A story on how two penetration testers physically broke into a company to test the security and the scary tactics they used. Is it possible to have a system that is safe against such an attack?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;the-privacy-security--osint-show&quot;&gt;The Privacy, Security, &amp;amp; OSINT Show&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://inteltechniques.com/podcast.html&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-31-Podcasts/privacy_security_osint_show.png&quot; alt=&quot;The Privacy, Security, &amp;amp; OSINT Show&quot; style=&quot;float: right; margin-right: 0px; margin-top: 0px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://inteltechniques.com/podcast.html&quot; target=&quot;_blank&quot;&gt;The Privacy, Security, &amp;amp; OSINT Show&lt;/a&gt;, hosted by Michael Bazzell, is a weekly podcast that focuses exactly on what the title says: privacy, security, and open source intelligence. Michael describes himself as a guy who’s wearing a tinfoil hat, but also makes a compelling case in every show why that is actually a good thing. He gives very direct and valuable advice on specific topics, but also has very basic introductions to subjects that he presents on a regular basis (look for “back to basics” episodes). All in all, a well rounded show for the more paranoid / in-depth listener. Some posts that will come out here are very much inspired by Michael’s podcast.&lt;/p&gt;
+
+&lt;p&gt;Compared to other shows, this show is more on the informative side. Usually Michael discusses the latest news and gives his personal opinion on things. However, the main segment of the show generally is on a specific topic rather than just the news. Sometimes he also hosts listener question shows, which are always interesting and fun to look into.&lt;/p&gt;
+
+&lt;p&gt;Back in the day, there was still a forum hosted on his &lt;a href=&quot;https://inteltechniques.com&quot; target=&quot;_blank&quot;&gt;website&lt;/a&gt; that went along with the show. There were also online tools for OSINT investigators. Both of these features are long gone. I’m especially sad that about the forum, because it was a great space to get advice and also see some of the methodology in writing. My main “issue” with the podcast is that it is sometimes fairly rough to put something into practice when you just hear about it while driving to work. This is in fact one reason why I decided to start writing things I’m interested in down, which ultimately also led to this blog.&lt;/p&gt;
+
+&lt;p&gt;Michael is also an author and published two recent books; one on &lt;a href=&quot;https://inteltechniques.com/book1.html&quot; target=&quot;_blank&quot;&gt;OSINT techniques&lt;/a&gt; and one on &lt;a href=&quot;https://inteltechniques.com/book7.html&quot; target=&quot;_blank&quot;&gt;extreme privacy&lt;/a&gt;. I am only familiar with the privacy one. It is basically a guide book and helps you step by step to become more private. There are some very valuable lessons in the book, some very extreme techniques, and it is very obvious that Michael has tested many different ways to stay private and secure: I highly recommend you to read it. And if you want to start smaller have a look at his &lt;a href=&quot;https://inteltechniques.com/data/workbook.pdf&quot; target=&quot;_blank&quot;&gt;online workbook&lt;/a&gt; for data removal. This workbook first explains why you  must have a credit freeze if you live in the US and have a SSN and then goes into giving the reader a detailed list on places on the internet that might display your personal information to the public (and how you can remove it!). Even if you don’t care about your privacy, please go and have a look at the credit freeze chapter!&lt;/p&gt;
+
+&lt;h1 id=&quot;the-social-engineer-podcast&quot;&gt;The Social-Engineer Podcast&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.social-engineer.org/category/podcast/&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-31-Podcasts/soceng.png&quot; alt=&quot;The Social-Engineer Podcast&quot; style=&quot;float: right; margin-right: 0px; margin-top: 0px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://www.social-engineer.org/category/podcast/&quot; target=&quot;_blank&quot;&gt;The Social-Engineer Podcast&lt;/a&gt; is hosted by Chris Hadnagy, a social engineering expert and author. The podcast is released on the second Monday of each month and always has a guest that Chris interviews. These guests will talk about their work, which is always somehow related to social engineering. A wide variety of guests appear on the show: from former FBI agents to academics.&lt;/p&gt;
+
+&lt;p&gt;The podcast has a very predictable structure: It starts with Chris being amazed on the episode number, then bringing the guest onto the show. In the middle of interview there is a short break on “What’s new in the world of &lt;a href=&quot;https://www.social-engineer.org&quot; target=&quot;_blank&quot;&gt;social-engineer.org&lt;/a&gt;”, which discusses current happenings, training, etc. Then the interview continues and at the end ends with the guest giving reading recommendations. The regular play time is around an hour, probably around 45 min of which is the interview.&lt;/p&gt;
+
+&lt;p&gt;Chris also has a company that works in the social engineering field and authored several books on the topic. Furthermore, he is the founder of the &lt;a href=&quot;https://www.innocentlivesfoundation.org&quot; target=&quot;_blank&quot;&gt;Innocent Life Foundation&lt;/a&gt;. The foundation helps law enforcement to track down child predators and uses open source intelligence gathering to build up cases against them. They work closely together with law enforcement and are not a vigilante organization. Go check out their cause!&lt;/p&gt;
+
+&lt;h1 id=&quot;cyber&quot;&gt;Cyber&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.vice.com/en_us/topic/Cyber&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-31-Podcasts/cyber.png&quot; alt=&quot;Cyber&quot; style=&quot;float: right; margin-right: 0px; margin-top: 0px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://www.vice.com/en_us/topic/Cyber&quot; target=&quot;_blank&quot;&gt;Cyber&lt;/a&gt;, hosted by Ben Makuch, is a podcast produced by Motherboard. It discusses current, news-related topics and is a great podcast to stay up to date. It is basically an audio version of the Motherboard (Tech by Vice) &lt;a href=&quot;https://www.vice.com/en_us/section/tech&quot; target=&quot;_blank&quot;&gt;website&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The show consists of two segments: the first half presents one current hot news topic. Usually, Ben interviews the reporter that broke the story, which usually are on cyber-related subjects such as data breaches, encryption, big tech companies, etc. The second segment of the show, now called Cyber Cypher (formerly called the Roundup) briefly goes through the last weeks news and discusses cyber related stories that were reported on &lt;a href=&quot;https://www.vice.com/en_us/section/tech&quot; target=&quot;_blank&quot;&gt;Motherboard’s website&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This is a great podcast if you want to stay up to date on what’s currently going on. The guests are always very knowledgeable and the topics are well picked and produced.&lt;/p&gt;
+
+&lt;h1 id=&quot;motherhacker&quot;&gt;Motherhacker&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://gimletmedia.com/shows/motherhacker&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-31-Podcasts/motherhacker.jpg&quot; alt=&quot;Motherhacker&quot; style=&quot;float: right; margin-right: 0px; margin-top: 0px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://gimletmedia.com/shows/motherhacker&quot; target=&quot;_blank&quot;&gt;Motherhacker&lt;/a&gt;, written by Sandi Farkas and produced by Gimlet Media - this one is for fun! Motherhacker is a scripted podcast, i.e., it’s a story that is specifically written and produced for audio.&lt;/p&gt;
+
+&lt;p&gt;Bridget, aside from taking care of her kids (kind of) and struggling with her husband who is in rehab, got vished. She tries to track down the people who got her, she does, and soon starts working for them.&lt;/p&gt;
+
+&lt;p&gt;Listen for yourself, it’s short, quirky, and definitely worth checking out! Fantastically produced, super confusing at the beginning, but you’ll get the hang of it fairly fast.&lt;/p&gt;
+
+&lt;h1 id=&quot;reply-all&quot;&gt;Reply All&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://gimletmedia.com/shows/reply-all&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-31-Podcasts/reply_all.jpg&quot; alt=&quot;Reply All&quot; style=&quot;float: right; margin-right: 0px; margin-top: 0px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://gimletmedia.com/shows/reply-all&quot; target=&quot;_blank&quot;&gt;Reply All&lt;/a&gt; - another show by Gimlet Media is hosted by PJ Vogt and Alex Goldman. If you have heard the show you might think it’s weird that I mention it last. The reason why I kept it for last is because this is the one show that started it all! But let’s start at the beginning. Reply All calls itself a “show about the internet” and is actually about the internet and technology in its broadest sense.&lt;/p&gt;
+
+&lt;p&gt;Week after week - sometimes bi-weekly - PJ and Alex discuss stories that are sometimes closely related, sometimes tangentially related to technology, often also to (weird) internet culture, and pretty much always to human interactions. There is their regular show in which they discuss a specific story. However there are also other, more specific shows / segments that repeat themselves: “Super Tech Support” is a segment where they try to help somebody out who has a really weird problem. The segment called “Yes, Yes, No” is a segment where, usually, Alex Blumberg (the co-founder and CEO of Gimlet Media) brings a tweet to the two that he doesn’t understand, and they discuss it in detail and give an explanation to result in a “Yes, Yes, Yes”, i.e., all three understand the tweet. The alternative version of this segment is called “Sports, sports, sports”, where Alex Blumberg brings a tweet, usually about basketball, that only he understands. The two sometimes have guests on the show, sometimes do weird experiments, and sometimes have a call-in show. Always a blast to listen to. Check out their &lt;a href=&quot;https://gimletmedia.com/shows/reply-all/posts/getting-started&quot; target=&quot;_blank&quot;&gt;getting started site&lt;/a&gt; for recommendations on where to begin listening.&lt;/p&gt;
+
+&lt;p&gt;As I mentioned: Reply All started it all, the episode &lt;a href=&quot;https://gimletmedia.com/shows/reply-all/v4he6k/130-the-snapchat-thief&quot; target=&quot;_blank&quot;&gt;“The Snapchat Thief”&lt;/a&gt;, which aired on November 8, 2018, sent me down the privacy rabbit-hole. This in return also brought me closer again to the security side of computers. After the episode I immediately started listening to Michael Bazzell’s “Privacy, Security, &amp;amp; OSINT show”, from which I found my way to the Social Engineer Podcast, to Cyber, and to Darknet Diaries…&lt;/p&gt;
+
+&lt;p&gt;Now you understand why Reply All is listed last, not because it’s least, but because it was the show that started it all!&lt;/p&gt;
+
+&lt;p&gt;Have fun and enjoy listening!&lt;br /&gt;
+-k0dk0d&lt;/p&gt;</content><author><name>k0dk0d</name></author><category term="Security" /><category term="Privacy" /><category term="Information" /><category term="Fun" /><summary type="html">If you’re commuting a lot, you to work out, or you just are bored at home while cleaning, podcasts are a great way of learning something new, having fun, and occupying yourself. Here, I present my favorite podcasts on technology, security, and privacy. Maybe you are looking for something to listen to as well? There’s hopefully something here for every enthusiast, especially since you’re obviously reading some weird corner of the internet.</summary></entry><entry><title type="html">Account Security - Passwords</title><link href="http://localhost:4000/2020/01/21/Passwords.html" rel="alternate" type="text/html" title="Account Security - Passwords" /><published>2020-01-21T00:00:00-08:00</published><updated>2020-01-21T00:00:00-08:00</updated><id>http://localhost:4000/2020/01/21/Passwords</id><content type="html" xml:base="http://localhost:4000/2020/01/21/Passwords.html">&lt;p&gt;Fitting for the start of this blog and still almost the start of the year, I want to discuss passwords and account security. I will discuss topics such as: How to choose passwords? How many passwords do you have to remember? How do you store your passwords? Why should you do things this way?&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;This article is intended to give you some basic best practices on how to keep your accounts secure. Account security is not complicated but requires a little bit of time to set up. How much depends heavily on how many steps you have already completed. In the end you will save time when following these best practices and stay more secure!&lt;/p&gt;
+
+&lt;h1 id=&quot;the-gist&quot;&gt;The Gist&lt;/h1&gt;
+
+&lt;p&gt;The shortest possible explanation of everything you find below without much explanation:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Every account requires a unique and strong password, which contains &amp;gt;50 characters including numbers and symbols&lt;/li&gt;
+  &lt;li&gt;Use a password manager, it will make your life easier, more secure, and more convenient compared to whatever you have now
+    &lt;ul&gt;
+      &lt;li&gt;The safest password manager strategy is an offline password manager like &lt;a href=&quot;https://keepassxc.org/&quot; target=&quot;_blank&quot;&gt;KeePassXC&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;The more convenient way is to have an online password manager. Choose a reputable one, examples of such are &lt;a href=&quot;https://bitwarden.com/&quot; target=&quot;_blank&quot;&gt;Bitwarden&lt;/a&gt; or &lt;a href=&quot;https://www.lastpass.com/&quot; target=&quot;_blank&quot;&gt;LastPass&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;Your password manager needs to be protected with a strong and unique password&lt;/li&gt;
+      &lt;li&gt;You need to have a backup of your password manager&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;In addition to passwords all of your accounts should be protected with two factor authentication (2FA)
+    &lt;ul&gt;
+      &lt;li&gt;The best way to do 2FA is with a hardware token, such as a &lt;a href=&quot;https://www.yubico.com/&quot; target=&quot;_blank&quot;&gt;Yubikey&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;If no hardware token is available / possible, use a software token&lt;/li&gt;
+      &lt;li&gt;The least favorable 2FA method is via SMS. If necessary, do not use your cell phone number, but set SMS 2FA it up using a VOIP number, e.g., Google Voice&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Any of your accounts is only as secure as the recovery method:
+    &lt;ul&gt;
+      &lt;li&gt;Use unique and random answers to security questions. Ideally generate these answers using a password generator&lt;/li&gt;
+      &lt;li&gt;Your recovery e-mail address needs to be secure&lt;/li&gt;
+      &lt;li&gt;Try to log into your account without credentials and find out how easy / hard it is by trying to recover your password&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;passwords&quot;&gt;Passwords&lt;/h1&gt;
+
+&lt;p&gt;You always hear that you should use random passwords with numbers, symbols, upper, and lower case letters. Let’s see why this is true, what you need to consider, and why you should not be able to remember your passwords. Working through this post and implementing it will take some time and some getting used to. However, you will gain a lot of account security and will, once all is set up and you are used to your new workflow and tools, have more convenience as well.&lt;/p&gt;
+
+&lt;p&gt;The most crucial constraint for the average user of today is that you have unique and strong passwords for every account. The importance of this cannot be stressed enough! The reasons for this requirement lay in data breaches. Have you ever been in a data breach? I myself have been in multiple data breaches. One of my older e-mail addresses for example was alone part of 5 different ones. To check if you were in a data breach with one of your e-mail addresses the Australian security researcher Troy Hunt compiled a unique database of data breaches. This database is publicly searchable and allows you to check if you have been part of a data breach. Go to the following website 
+&lt;a href=&quot;https://haveibeenpwned.com/&quot; target=&quot;_blank&quot;&gt;https://haveibeenpwned.com/&lt;/a&gt;
+and enter your e-mail addresses. Troy’s website will immediately search a large database of breached data to check if you were breached. If you were in a data breach ask yourself: Do you use the password for that service somewhere else? What could a hacker do if they pick your e-mail address and password and try to log into your bank, your retirement account, etc.? Also: there are surely data breaches out there that have not been included in any web databases. While you might not be a target per se, hackers have started to use data breaches and automatically test all usernames and passwords that are in such databases on other sites. This is known as credential stuffing and even if you are not a target you can become a victim if you recycle passwords. If you never recycle passwords (and ideally neither usernames, just to be even more secure), credential stuffing will not work on you.&lt;/p&gt;
+
+&lt;p&gt;Why a strong password? Let’s assume your password is flower and you only use it for your bank account. A hacker won’t get into your account by credential stuffing, but could still get into your account by a brute-force method, i.e., by password guessing. In this case, the password flower is a standard word in the English dictionary. If a hacker simply tries through the whole dictionary, your account would be wide open in no time. So what should you do?&lt;/p&gt;
+
+&lt;p&gt;Use randomly generated passwords that contain numbers, symbols, upper, and lower case letters! Let us go through how to create randomized passwords, look at how describe it in physical terms, and how to make your life safer and easier by using a password manager.&lt;/p&gt;
+
+&lt;h2 id=&quot;random-password-generators&quot;&gt;Random Password Generators&lt;/h2&gt;
+
+&lt;p&gt;While my actions often seem random to me, they are not really. To come up with truly random passwords you want to have software that actually truly randomizes this process. Many password managers (discussed further down) come with a random password generator. These usually let you choose multiple settings:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Letters&lt;/li&gt;
+  &lt;li&gt;Numbers&lt;/li&gt;
+  &lt;li&gt;Symbols and special characters&lt;/li&gt;
+  &lt;li&gt;Extended ASCII characters (in some cases)&lt;/li&gt;
+  &lt;li&gt;Length of the password&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Play around with these random password generators and see how to use them and how the settings work. Generally you want to turn on as many special characters as are allowed for a given password. When it comes to length, why not choose a password that is as long as is allowed? With a password manager you won’t have to remember it anyway. Personally I started playing the game on how long of a password am I allowed to choose for a given website… some already drop out at 20 characters, some make it up to 60, some a lot more. How many characters do your services allow in a password?&lt;/p&gt;
+
+&lt;h2 id=&quot;maximizing-entropy&quot;&gt;Maximizing Entropy&lt;/h2&gt;
+
+&lt;p&gt;A detailed break down on randomized passwords, entropy, and password strength can be found on &lt;a href=&quot;https://en.wikipedia.org/wiki/Password_strength&quot; target=&quot;_blank&quot;&gt;Wikipedia&lt;/a&gt;. Let us consider the following scenario: we choose a password of length &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;. If there is a total of &lt;script type=&quot;math/tex&quot;&gt;N&lt;/script&gt; symbols available to choose from, the number of possible passwords with that length are &lt;script type=&quot;math/tex&quot;&gt;N^k&lt;/script&gt;. Your ATM PIN, assuming it consists of 4 out of 10 possible digits can be guessed in 10000 tries. Assuming it takes 5 seconds to test a pin for a (very dedicated) human being, your ATM PIN could be guessed by such a manual brute-force hacker in roughly 14 hours. A computer will be much faster.&lt;/p&gt;
+
+&lt;p&gt;It is common to give password strength in terms of information entropy, which is measured in bits. Instead of giving the number of possibilities (as calculated above), the entropy &lt;script type=&quot;math/tex&quot;&gt;H&lt;/script&gt; of a password is simply defined as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;H= \log_{2} \left(N^{k}\right)&lt;/script&gt;
+
+&lt;p&gt;These numbers are a bit handier to deal with. If you think about computers and binary the makes sense. In binary you have 2 possibilities per bit to guess, 1 and 0. For a password of length &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;, you thus have &lt;script type=&quot;math/tex&quot;&gt;2^k&lt;/script&gt; possibilities. Here, this would result in the entropy &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;A more complicating password will contain more characters and draw the characters from a larger pool. All printable ASCII characters (so most of the things on your keyboard) are 95 characters. If you have a password of 10 characters, you will have an entropy of 65.7. This means, that guesses are necessary to surely guess your password. I let you calculate the actual number.&lt;/p&gt;
+
+&lt;h2 id=&quot;password-managers&quot;&gt;Password Managers&lt;/h2&gt;
+
+&lt;p&gt;The question now poses itself: How do you remember high entropy passwords that are completely random. The answer is simple: You don’t. Fortunately there are tools that do this for you. These tools are password managers. Password managers, which often come with random password generators, safe your unique passwords in an encrypted database and make them available to you with a master password. This means that all your password will be protected by one password, and (hopefully) by a second factor authentication key.&lt;/p&gt;
+
+&lt;p&gt;There are two kind of password managers: online and offline password managers. Examples and recommendations are discussed below. You have to answer the question on what you want: do you want to have your passwords online and easily sync-able, however, give up some privacy / security in order to have a (hopefully reputable) company manager your passwords, or do you do everything yourself offline. I will outline both approaches below. For most people, the online password manager approach is likely the best way to go. However, if you are slightly paranoid (like myself), the offline method is for sure safer. But backups, file corruptions, etc. are all completely up to you if you go the offline way. This should not scare you however.&lt;/p&gt;
+
+&lt;p&gt;As so often in science, a mixture of the two methodologies - an online and and offline password manager - might be even more in the sweat spot for you!&lt;/p&gt;
+
+&lt;h3 id=&quot;online-password-managers&quot;&gt;Online Password Managers&lt;/h3&gt;
+
+&lt;p&gt;A reputable online password manager will have the following features:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;It lets you log in with your master password and a second factor authentication (if set up)&lt;/li&gt;
+  &lt;li&gt;Encrypts the password (using strong encryption) on your device prior to sending it to the storage&lt;/li&gt;
+  &lt;li&gt;Never sees your password!&lt;/li&gt;
+  &lt;li&gt;Provides you with plugins such that you can easily auto-fill passwords in browsers and on mobile devices&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Don’t choose the latest super password manager with all bells and whistles that you have just read about on some social media post from a friend. You should choose a reputable password manager. I will discuss two online password managers. This is not meant as a comprehensive list but rather as two examples of reputable online password managers that I have tested.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: Your password manager is only as secure as your master password (and your second factor authentication). If you use your standard password that has been leaked all over the internet already along with your standard e-mail address, your security will be fairly poor. Thus, come up with a strong master password! You can write it down (in hand writing) somewhere at home until you have memorized it.&lt;/p&gt;
+
+&lt;p&gt;Now that the ground rules are established, let’s have a look on how you should approach password managers. Choose one, go ahead, and open a free account. Make sure you add 2 factor authentication right away in order to get that extra security layer on your account. First add one or two accounts that you use fairly frequently, but which are not extremely important. For example, add your newspaper credentials. Install the plugins for your browsers and test them out by logging into your newspaper. How easy is it? Change the password and have it stored automatically in your password manager’s vault. To come up with a new password, find the password generator and create one (don’t forget what you just learned on entropy). If you don’t like a password manager not much has gone wrong at this point. Choose another password manager and start over. Make sure that (1) you delete your account on the password manager you did not like, (2) you change the passwords that you have given to that password manager, and (3) don’t reuse the master password (you probably haven’t memorized it just yet anyway, and if you did, are you sure you choose a strong master password?).&lt;/p&gt;
+
+&lt;p&gt;Once you decide that a password manager suits your needs go ahead and add your important accounts. These are likely banks, financial services, and e-mail accounts. Go through every account and change your passwords. Set strong passwords that were auto-generated by the password generator of your manager. Once you have your crucial accounts added and all the passwords are set to be long, randomized, and unique, take a break: you deserved it! Form now on whenever you log into a less important account, e.g., your online shopping account, go ahead and change the password in the same way to set something unique. Ideally, everything in your life will be in your password manager soon enough. You hopefully also realized how convenient these password managers are. This means you are actually secure and don’t have to type that much anymore either - even better.&lt;/p&gt;
+
+&lt;p&gt;Let’s have a look at some online password managers now:&lt;/p&gt;
+
+&lt;h4 id=&quot;bitwarden&quot;&gt;Bitwarden&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://bitwarden.com/&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-21-Passwords/bitwarden_logo_320px.png&quot; alt=&quot;Bitwarden logo&quot; style=&quot;float: right; margin-right: 0px; margin-top: 6px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://bitwarden.com/&quot; target=&quot;_blank&quot;&gt;Bitwarden&lt;/a&gt; is an online password manager with several advantages over other competitors, so if you don’t have a password manager and want to go with an online solution, this might be a good one to start with. The reasons I like bitwarden are:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Source code has been independently reviewed and is available open source on github&lt;/li&gt;
+  &lt;li&gt;You can self-host your own password manager (however, you could simply go with an offline version in that case)&lt;/li&gt;
+  &lt;li&gt;Clear business model: always free accounts are great for testing, additional features with a paid account&lt;/li&gt;
+  &lt;li&gt;Paid account with additional features is very cheap at $10/year&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For bitwarden I highly recommend a paid account. A paid account will let you add a Yubikey as your second factor authentication. This is to be preferred over a software token (see below for details). In addition you get 1GB to store files. This can be useful if you need certain documents available on the go.&lt;/p&gt;
+
+&lt;h4 id=&quot;lastpass&quot;&gt;LastPass&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.lastpass.com/&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-21-Passwords/200px-LastPass_logo.png&quot; alt=&quot;LastPass logo&quot; style=&quot;float: right; margin-right: 0px; margin-top: 6px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+&lt;a href=&quot;https://www.lastpass.com/&quot; target=&quot;_blank&quot;&gt;LastPass&lt;/a&gt; is another commercially available password manager that follows the freemium model, i.e., you can create a free account which has a decent number of options, but certain options and features require an extra subscription. I have tested and used LastPass. In general, it is fairly similar to bitwarden. The features of LastPass:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Reputable company: Yes you’ll find information on data breaches online that talk about LastPass. Don’t let this information drive you crazy: no passwords have - as far as is known today - been compromised and the company has disclosed the data breaches in a rapid way. The questions should never be if a website get breached, but when.&lt;/li&gt;
+  &lt;li&gt;Clear business model: Freemium&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The paid / professional accounts are $36/year, which is significantly more than bitwarden. At first glance, you also get Yubikey support (so again, you want to have a paid account). This will also allow you to store files, up to a total of 1GB.&lt;/p&gt;
+
+&lt;h3 id=&quot;offline-password-managers&quot;&gt;Offline Password Managers&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://keepassxc.org/&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/assets/img/posts/2020-01-21-Passwords/200px-KeePassXC.png&quot; alt=&quot;KeePassXC logo&quot; style=&quot;float: right; margin-right: 0px; margin-top: 6px; margin-left: 0px, margin-bottom: 0px&quot; /&gt;&lt;/a&gt;
+So you’re paranoid (that’s a compliment in this context!), congratulations! The safest way to protect a file from getting stolen in a data breach is to never have it online! An offline password manager will help to exactly do this.&lt;/p&gt;
+
+&lt;p&gt;Here, &lt;a href=&quot;https://keepassxc.org/&quot; target=&quot;_blank&quot;&gt;KeePassXC&lt;/a&gt; is my recommended password manager and also the one I use heavily. It comes for every operating system and you can also have browser plugins for Firefox and Chrome/Chromium/Vivaldi. Let’s be honest, if you are using an offline password manager, you are most likely using Firefox as your web browser anyway, or you don’t want the plugin feature anyway.&lt;/p&gt;
+
+&lt;p&gt;For two factor authentication with your Yubikey you will have to set one slot of your Yubikey up with an HMAC-SHA1 challenge response. &lt;a href=&quot;https://www.yubico.com/products/services-software/personalization-tools/challenge-response/&quot; target=&quot;_blank&quot;&gt;Here&lt;/a&gt; is a video on how to do this. If you have never personalized your Yubikey, it should be save to configure slot 2 for the HMAC-SHA1 challenger response. Note: if you want to use the Android password manager mentioned below, make sure to select Variable input for the HMAC-SHA1 Mode, otherwise it won’t work. Once your Yubikey is written the configuration manager will ask you to save your secret into a file. Do so and store the file in a secure location. You can use the same Secret Key to program another backup Yubikey as well.&lt;/p&gt;
+
+&lt;p&gt;At this point you should have your KeePassXC ready to go and can go ahead and get used to it. However, even an offline password database could have its use on mobile devices. For android, use &lt;a href=&quot;https://github.com/PhilippC/keepass2android&quot; target=&quot;_blank&quot;&gt;Keepass2Android&lt;/a&gt;. For iOS use &lt;a href=&quot;https://strongboxsafe.com/&quot; target=&quot;_blank&quot;&gt;Strongbox&lt;/a&gt;. These two apps are the ones that are also recommended by KeePassXC.&lt;/p&gt;
+
+&lt;p&gt;To set up &lt;a href=&quot;https://github.com/PhilippC/keepass2android&quot; target=&quot;_blank&quot;&gt;Keepass2Android&lt;/a&gt; with your Yubikey, you want to additionally install &lt;a href=&quot;https://play.google.com/store/apps/details?id=net.pp3345.ykdroid&amp;amp;hl=en_US&quot; target=&quot;_blank&quot;&gt;ykDroid&lt;/a&gt;. This app exposes the challenge response from your Yubikey and makes it available to other apps. KeePass2Android requires this in order to accept the challenge response for database decryption. Then load your database, select Password and Challenge Response for KeePassXC, allow the usage of ykDroid to read your challenge response, and insert or tap your Yubikey (with NFC) to respond. You should be logged in.&lt;/p&gt;
+
+&lt;p&gt;For &lt;a href=&quot;https://strongboxsafe.com/&quot; target=&quot;_blank&quot;&gt;Strongbox&lt;/a&gt;, there is currently no way of using a Yubikey. This will likely change in the near future since Yubico, the maker of Yubikeys, is developing keys that will also work with iOS. However, as of this writing, you will have to manually copy the secret into Strongbox. This defeats the 2FA on this device, since you’ll need the Yubikey secret (which you stored into a file above) and type it into the app. You can find more details on the current development on the &lt;a href=&quot;https://github.com/strongbox-password-safe/Strongbox&quot; target=&quot;_blank&quot;&gt;Strongbox’ github&lt;/a&gt; site and in &lt;a href=&quot;https://github.com/strongbox-password-safe/Strongbox/issues/95&quot; target=&quot;_blank&quot;&gt;this issue tracker&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;backups&quot;&gt;Backups&lt;/h2&gt;
+
+&lt;p&gt;No matter what password manager you choose, you must have a backup of the database. This is obvious for your offline password manager but should also be done if you go the online route: What happens if the service suddenly goes away? What happens if the server of the company gets hacked and is offline for an extended period of time until it gets get patched?&lt;/p&gt;
+
+&lt;p&gt;In case of your KeePassXC it’s simple: back up your kdbx database. This is an encrypted file. In addition you want to consider to save a new version of the file every now and then and keep a manual history in case of file corruption. And furthermore, you want to have at least two backups of your database in two different locations!&lt;/p&gt;
+
+&lt;p&gt;For online password managers you should have an offline copy. You will only use it in case the company goes out of business, if their server gets hacked or wrecked, or if it is down for an extended period of time. For all online password managers you can export the database, usually as un-encrypted files. These files you want to store in a secure location, e.g., on an encrypted hard drive, or even better, in an encrypted &lt;a href=&quot;https://www.veracrypt.fr/en/Home.html&quot; target=&quot;_blank&quot;&gt;Veracrypt&lt;/a&gt; container (a blog post on hard drive security will come soon). Since this password file is readable by anybody that has access to it, make sure you store it somewhere safe. Under absolutely no circumstances store it in the cloud! The cloud is not a location for unencrypted (password) files!&lt;/p&gt;
+
+&lt;h1 id=&quot;two-factor-authentication-2fa&quot;&gt;Two-Factor Authentication (2FA)&lt;/h1&gt;
+
+&lt;p&gt;Two factor authentication should be used for any account that allows it. Basically, it adds a second part to the login process, you will need something you know (your password) and something you have (a &lt;a href=&quot;https://www.yubico.com/&quot; target=&quot;_blank&quot;&gt;Yubikey&lt;/a&gt;, phone, etc.). Here only the basics are given, a more detailed write-up on 2FA will come soon.&lt;/p&gt;
+
+&lt;p&gt;As with the password manager, you will need a backup of your 2FA token or the security code that can defeat it (which is usually given when you set it up). Store this code in a safe location!&lt;/p&gt;
+
+&lt;h2 id=&quot;hardware-tokens&quot;&gt;Hardware Tokens&lt;/h2&gt;
+
+&lt;p&gt;Surely the best way to stay secure is a hardware token. These are generally devices that you can plug in via USB and that provide the second factor authentication. Yubikeys, sold by &lt;a href=&quot;https://www.yubico.com/&quot; target=&quot;_blank&quot;&gt;Yubico&lt;/a&gt;, are some of the most widely used hardware tokens and should be part of any security plan.&lt;/p&gt;
+
+&lt;p&gt;If you use a hardware token you’ll need to have at least two, one for daily use and one as a backup that you keep in a secure location. If your whole family has hardware tokens (and you trust them), it is okay to share the backup key.&lt;/p&gt;
+
+&lt;p&gt;Have a look at the &lt;a href=&quot;https://www.yubico.com/&quot; target=&quot;_blank&quot;&gt;Yubico’s website&lt;/a&gt;, they have a lot of step-by-step instructions on how to set up Yubikeys with various services.&lt;/p&gt;
+
+&lt;h2 id=&quot;software-tokens&quot;&gt;Software Tokens&lt;/h2&gt;
+
+&lt;p&gt;Many websites don’t allow hardware tokens but can be setup to use 2FA with software tokens by using an authenticator app (such as, e.g., &lt;a href=&quot;https://authy.com/&quot; target=&quot;_blank&quot;&gt;Authy&lt;/a&gt;). These software tokens can also be stored on Yubikeys, instructions can be found &lt;a href=&quot;https://www.yubico.com/products/services-software/download/yubico-authenticator/&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;sms-2fa&quot;&gt;SMS 2FA&lt;/h2&gt;
+
+&lt;p&gt;The least secure two factor authentication is SMS 2FA (see the section on security risks below). If there is absolutely no other way to get 2FA going, SMS should be used - it’s better than not having 2FA. If you need to make use of SMS 2FA make sure you DO NOT use your cell phone number. Use a VOIP number instead (e.g., Google Voice) that, e.g., forwards all incoming text messages to a secure e-mail address. Otherwise, you will be a potential target for a SIM swapping attack.&lt;/p&gt;
+
+&lt;h1 id=&quot;security-risks&quot;&gt;Security Risks&lt;/h1&gt;
+
+&lt;p&gt;No system is perfect, but if you follow the outlined tactics, you will have made yourself a harder target than most and should be safe from broad attacks that use credential stuffing, etc. If a hacker or nation state actor targets you specifically the basic steps lined out here are probably not going to cut it!&lt;/p&gt;
+
+&lt;h2 id=&quot;sms-2fa-and-its-issues&quot;&gt;SMS 2FA and its issues&lt;/h2&gt;
+
+&lt;p&gt;As mentioned above, SMS 2FA should only be used if no other way to setup 2FA is available. The issue here is that it has become very easy, especially in the US, to do SIM swapping attacks. A detailed article can be found &lt;a href=&quot;https://www.vice.com/en_us/article/5984zn/listen-to-sim-jacking-account-ransom-instagram-email-tmobile&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; on Motherboard’s website. Basically, in a SIM swapping attack an attacker calls up the phone company and pretends to be you. The hacker will claim that you lost your phone and has your phone number ported to a new SIM card, which is in the hackers possession. You will loose your network at this point, however, by the time you have notified the phone company the hacker will likely already have used your phone number to reset accounts and receive 2FA authentication codes. Therefore, it is recommended that you use a VOIP number in order to setup 2FA. Google has fairly good account security. With a strong password and Yubikey U2F authentication, your google voice number will be fairly secure from any attacks, for sure much better than your actual SIM phone number.&lt;/p&gt;
+
+&lt;h2 id=&quot;open-source-intelligence-gathering-and-security-questions&quot;&gt;Open Source Intelligence Gathering and Security Questions&lt;/h2&gt;
+
+&lt;p&gt;Another thing to consider is the following: Not only your passwords can get leaked, but also the answers to your security questions. Ask yourself: can you reset an account and 2FA by simply answering the questions “What was your first car” and “What’s the name of your first pet”? Also: ask yourself if you actually posted a photo of you and your first car on Facebook or tweeted an RIP statement about your first pet? Your questions could easily be out there. Security questions should always be answered with random characters that are generated by your password manager and should be stored in a secure location, e.g., your password manager. Since you have appropriate backups in place now there are not any good reasons to remember the answer to these questions anyway!&lt;/p&gt;
+
+&lt;h2 id=&quot;account-recovery&quot;&gt;Account recovery&lt;/h2&gt;
+
+&lt;p&gt;Finally, another word of caution: What happens if you actually loose your password. You won’t do this, of course, but ask yourself: How easy would it be for a hacker to reset the password? Can your password be reset? It is worth, especially for your valuable account, to test how you would get into them. Do you have weak security questions / answers pairs set up? Is your password super long and you use a Yubikey with U2F but the password can be reset via your old hotmail e-mail address that uses the password flower, which has been in 17 data breaches? You get my point: your account is only as secure as the possibility to reset it. Test how you would get into your own account and make it more secure by randomizing security questions, and by using unique usernames, unique e-mail addresses, etc. If your bank gets breached, you are likely going to experience some inconvenience but your money should be insured. If your account gets breached because you are not using appropriate safety measures this could be different.&lt;/p&gt;
+
+&lt;p&gt;Stay safe!&lt;br /&gt;
+-k0dk0d&lt;/p&gt;</content><author><name>k0dk0d</name></author><category term="Basics" /><category term="Security" /><summary type="html">Fitting for the start of this blog and still almost the start of the year, I want to discuss passwords and account security. I will discuss topics such as: How to choose passwords? How many passwords do you have to remember? How do you store your passwords? Why should you do things this way?</summary></entry><entry><title type="html">Welcome</title><link href="http://localhost:4000/2019/12/31/Welcome.html" rel="alternate" type="text/html" title="Welcome" /><published>2019-12-31T00:00:00-08:00</published><updated>2019-12-31T00:00:00-08:00</updated><id>http://localhost:4000/2019/12/31/Welcome</id><content type="html" xml:base="http://localhost:4000/2019/12/31/Welcome.html">&lt;h1 id=&quot;welcome&quot;&gt;Welcome&lt;/h1&gt;
+
+&lt;p&gt;Hi there! Welcome to my new website. If this is the only post available, then there’s not all that much here just yet, but more to come. Have a look at the &lt;a href=&quot;/about&quot;&gt;about&lt;/a&gt; section on what this blog will be about.&lt;/p&gt;
+
+&lt;!--more--&gt;
+&lt;p&gt;The main things to get here soon are my thoughts and implementation on:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Security&lt;/li&gt;
+  &lt;li&gt;Privacy&lt;/li&gt;
+  &lt;li&gt;DIY electronics&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;My main focus is on bringing these topics closer to scientists and to help people understand common attack vectors and data loss avenues.&lt;/p&gt;
+
+&lt;p&gt;I wish you all the best for 2020, stay safe!&lt;/p&gt;
+
+&lt;p&gt;-k0dk0d&lt;/p&gt;</content><author><name>k0dk0d</name></author><category term="About" /><summary type="html">Welcome Hi there! Welcome to my new website. If this is the only post available, then there’s not all that much here just yet, but more to come. Have a look at the about section on what this blog will be about.</summary></entry></feed>
