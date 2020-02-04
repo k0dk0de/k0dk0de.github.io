@@ -4,12 +4,12 @@ url: "https://k0dk0de.github.io"
 
 # THEME-SPECIFIC CONFIGURATION
 title: https://k0dk0de.github.io                        # site's title
-description: "Security, Privacy, Tech,... with a focus on scientists"      # used by search engines
+description: "Security, Privacy, Tech,... geared toward scientists"      # used by search engines
 avatar: assets/img/k0dk0d.png                           # Empty for no avatar in navbar
 favicon: assets/favicon.ico                             # Icon displayed in the tab
 
 # Header and footer text
-header_text: Security, Privacy, Tech,... with a focus on scientists   # Change Blog header text
+header_text: Security, Privacy, Tech,... geared toward scientists   # Change Blog header text
 header_feature_image: assets/img/pexels/code-cut.jpg
 footer_text: >
   Copyright: k0dk0d, 2020<br>Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/sylhare/Type-on-Strap" target="_blank">Type on Strap</a><br>Image Credit: <a href="https://www.pexels.com" target="_blank">pexels</a>
