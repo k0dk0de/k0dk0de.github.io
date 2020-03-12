@@ -32,4 +32,6 @@ If you would like to get in touch with me, feel free to contact me at:
 
 I will surely get back to you, if just to have a discussion, or if you'd like to propose a topic to be covered / have an idea that you'd like to see here, feel free to ask as well :)
 
+The domain for this website generally is [https://k0dk0d.xyz](https://k0dk0d.xyz). If this domain is for some reason not available, a notice will be posted [here](https://github.com/k0dk0de/k0dk0de.github.io/blob/master/README.md){:target="_blank"} on how to reach this blog.
+
 -[k0dk0d](https://en.wikipedia.org/wiki/Kodkod){:target="_blank"}

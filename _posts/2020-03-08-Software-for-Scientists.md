@@ -186,9 +186,9 @@ Finally: If you have dealt with python for a while but have not written a GUI ap
 
 # Writing
 ## Ghostwriter
-[Ghostwriter](http://wereturtle.github.io/ghostwriter/){:target="_blank"} is a very well designed open source editor for writing in markdown. This blog post is actually written and edited in ghostwriter. 
+[Ghostwriter](https://wereturtle.github.io/ghostwriter/){:target="_blank"} is a very well designed open source editor for writing in markdown. This blog post is actually written and edited in ghostwriter. 
 
-![Ghostwriter](http://wereturtle.github.io/ghostwriter/images/dark-theme-thumnail.png)
+![Ghostwriter](https://wereturtle.github.io/ghostwriter/images/dark-theme-thumnail.png)
 
 Ghostwriter has overlays that give you a markdown cheat sheet (who can remember all the things?), a table of contents, and stats of your document. It has different themes that all look good, and in general is a very clean and well done editor. It also has a live preview and comes with a distraction free mode.
 
