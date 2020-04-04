@@ -4,6 +4,10 @@
 # Mac files
 .DS_Store
 
+# Sublimetext
+*.sublime-project
+*.sublime-workspace
+
 # Byte-compiled / optimized / DLL files
 *.manifest
 *.spec
