@@ -98,29 +98,6 @@ A nice thing about open source software, not just with GIMP: There are lots and 
 Interesting here: since pdftk is a command line tool, feel free to script your way around stiching together more complex documents and to interface pdftk from your preferred programming language.
 
 
-## PDF Studio
-[PDF Studio*](https://www.qoppa.com/){:target="_blank"} is a bit of an outlier in this whole list. There is a free version (PDF Studio Viewer; see discussion at the end of this section). The full version is fairly expensive at $89 for the standard edition and $129 for the professional version. This purchase will get you updates to the current major version, i.e., if you purchase today, you will get all the updates for the 2019 version. The version numbering seems to be a lot like last year and a new version might come out soon.
-If you are working in academia there is a 50% discount to this price, and a 25% discount if you work for a non-profit organization. This makes the price a bit more reasonable.
-
-I was thinking and rethinking for a while if I want to mention PDF Studio at all or just leave it out. However, annotating pdf files is an absolute key capability for every scientist - you will need to correct what your colleagues wrote here and there, send comments on things back, etc. While Adobe Acrobat seems to be the default, it is (like every Adobe product), very expensive and bloated. Also, it does not exist for Linux, neither Adobe Acrobat, nor the Adobe Acrobat Reader. This is a major downside for me. PDF Studio Viewer, Standard, and Professional are truly cross platform and work excellently on all operating systems.
-
-Unfortunately, I have not found any open source solution that comes even close to what Adobe Acrobat can do and that is cross-platform. My requirements for a pdf editor are:
- * Annotate with notes, edits, deletions, insertions, typewriter, such that these annotations compatible with Acrobat
- * Have a list with check marks of all the annotations in a given file
- * Filter capability for annotations by author, checked / unchecked, ... 
- * Fill in forms and save them properly
-In addition what I like to see for a pdf editor, but is not crucial:
- * Capability to actually redact information properly
- * Sign documents electronically
- 
-PDF Studio allows you to test there software for free. They will add a big mark at the top when you save that file that you have used a testing version. That's annoying (which is surely the point), however, really let's you test the functionality. 
-
-Finally, PDF Studio also has [free viewer](https://www.qoppa.com/pdfstudioviewer/download/){:target="_blank"}. This program is analogous to the Adobe Acrobat Reader and basically has all my must have features already included. Especially if you are on Linux, PDF Studio Viewer is the way to go. 
-
-In conclusion: Sure, it will cost you a little bit of money if you want the professional edition. If you need the capability the program is worth it however. Give the free [PDF Studio Viewer](https://www.qoppa.com/pdfstudioviewer/download/){:target="_blank"} a try and have a look at the [comparison chart](https://www.qoppa.com/pdfstudioviewer/){:target="_blank"} on what the individual versions can do.
-
-If you know of an open source / different product that is cross-platfrom and has the discussed features, please [let me know](/about). I'd be more than happy to test it out and maybe even write about it.
-
 # Plotting
 ## Veusz
 A plotting program that is open source, cross-platform compatible is something that I couldn't find for the longest time. I first used Origin, then Igor, looked at ProFit and tested it out... These were all not cross-platform, not open source, and expensive solutions. Finally, I discovered [Veusz](https://veusz.github.io){:target="_blank"} and have used it ever since.
@@ -224,3 +201,5 @@ This product is fully offline so there is no need to share your work with the wo
 
 Have fun with these programs and [let me know](/about) what you think and if you have additions.  
 -k0dk0d
+
+*Update 2020-04-13*: I previously recommended a PDFStudio from Qoppa software as a pdf viewer and editor. I removed this recommendation due to privacy concerns. PDFStudio is pinging the qoppa server on a regular basis, until I have further evaluated this software I cannot honestly recommend it any longer. Stay tuned.
