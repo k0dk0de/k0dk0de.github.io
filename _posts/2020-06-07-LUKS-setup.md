@@ -4,7 +4,7 @@ title: Linux LUKS full disk encryption
 author: k0dk0d
 feature-img: assets/img/posts/header_chain.jpg
 excerpt_separator: <!--more-->
-tags: [Security, Advanced, Linux]
+tags: [Security, Advanced, Linux, Tutorials]
 ---
 
 Unencrypted hard drives can easily be accessed if stolen or lost. Your account password only prevents somebody from logging in while you are away from your machine. This is why every hard drive should be fully encrypted. This article goes in detail into the LUKS full hard drive encryption on Linux and provides instructions to set the encryption up, to decrypt with GPG smart cards, and what to do in an emergency. 
