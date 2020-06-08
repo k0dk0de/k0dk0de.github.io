@@ -3,7 +3,7 @@ baseurl: ""
 url: "https://k0dk0de.github.io"
 
 # THEME-SPECIFIC CONFIGURATION
-title: https://k0dk0d.xyz			                   # site's title
+title: k0dk0d			                   # site's title
 description: "Security, Privacy, Tech,... geared toward scientists"      # used by search engines
 avatar: assets/img/k0dk0d.png                           # Empty for no avatar in navbar
 favicon: assets/favicon.ico                             # Icon displayed in the tab
